@@ -10,7 +10,7 @@ void main_menu_page_run(AppState *app)
 
     if (app == NULL)
         return;
-
+    display_clear();
     display_show_line(0,"===== Main Menu =====");
     display_show_line(1,"1. Image browsing");
     display_show_line(2,"2. Image viewing");

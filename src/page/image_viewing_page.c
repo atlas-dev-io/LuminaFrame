@@ -10,7 +10,7 @@ void image_viewing_page_run(AppState *app)
 
     if (app == NULL)
         return;
-
+    display_clear();
     display_show_line(0,"===== Image Viewing Page =====");
     display_show_line(1,"show fake image here");
     display_show_line(2,"b. Back to image browsing");

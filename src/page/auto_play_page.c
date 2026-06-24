@@ -10,7 +10,7 @@ void auto_play_page_run(AppState *app)
 
     if (app == NULL)
         return;
-
+    display_clear();
     display_show_line(0,"===== Auto Play Page =====");
     display_show_line(1,"auto play fake images");
     display_show_line(2,"b. Back to main menu");

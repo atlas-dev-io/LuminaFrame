@@ -10,7 +10,7 @@ void image_browsing_page_run(AppState *app)
 
     if (app == NULL)
         return;
-
+    display_clear();
     display_show_line(0,"===== Image Browsing Page =====");
     display_show_line(1,"fake image 1: test1.jpg");
     display_show_line(2,"fake image 2: test2.jpg");
