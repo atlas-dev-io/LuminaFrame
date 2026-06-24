@@ -12,7 +12,6 @@ typedef struct{
     /* Current active page. */
     PageId current_page;
 
-
     /* TODO: add global state. */
     /* TODO: selected file. */
     /* TODO: current directory. */
@@ -20,6 +19,17 @@ typedef struct{
     /* TODO: user input event. */
 } AppState;
 
+
+/*
+ * Initialize application state.
+ */
+void app_init(AppState *app);
+
+
+/*
+ * Run application main loop.
+ */
+void app_run(AppState *app);
 
 
 #endif /* LUMINAFRAME_APP_H */

@@ -6,16 +6,24 @@
  */
 typedef enum{
     /* Main menu */
-    MAIN_MENU_PAGE      ,
+    PAGE_MAIN_MENU = 0  ,
 
     /* File browser */
-    IMAGE_BROWSING_PAGE ,
+    PAGE_IMAGE_BROWSING ,
 
     /* Image viewer */
-    IMAGE_VIEWING_PAGE  ,
+    PAGE_IMAGE_VIEWING  ,
 
     /* Slideshow */
-    AUTO_PLAY_PAGE      ,
+    PAGE_AUTO_PLAY      ,
+
+    /* Exit */
+    PAGE_EXIT           ,
 } PageId;
+
+/*
+ * Get page name for debug output.
+ */
+const char *page_get_name(PageId page);
 
 #endif /* LUMINAFRAME_PAGE_H */
