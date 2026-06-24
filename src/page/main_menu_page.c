@@ -1,7 +1,8 @@
 #include <stdio.h>
 
-#include "page/main_menu_page.h"
 #include "page/page.h"
+#include "page/main_menu_page.h"
+#include "display/display.h"
 
 void main_menu_page_run(AppState *app)
 {
@@ -10,12 +11,13 @@ void main_menu_page_run(AppState *app)
     if (app == NULL)
         return;
 
-    printf("\n===== Main Menu =====\n");
-    printf("1. Image browsing\n");
-    printf("2. Image viewing\n");
-    printf("3. Auto play\n");
-    printf("q. Quit\n");
-    printf("input: ");
+    display_show_line(0,"===== Main Menu =====");
+    display_show_line(1,"1. Image browsing");
+    display_show_line(2,"2. Image viewing");
+    display_show_line(3,"3. Auto play");
+    display_show_line(4,"q. Quit");
+    display_show_line(5,"input: ");
+    display_refresh();
 
     ch = getchar();
 

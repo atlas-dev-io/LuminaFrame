@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "page/auto_play_page.h"
+#include "display/display.h"
 #include "page/page.h"
 
 void auto_play_page_run(AppState *app)
@@ -10,11 +11,12 @@ void auto_play_page_run(AppState *app)
     if (app == NULL)
         return;
 
-    printf("\n===== Auto Play Page =====\n");
-    printf("auto play fake images\n");
-    printf("b. Back to main menu\n");
-    printf("q. Quit\n");
-    printf("input: ");
+    display_show_line(0,"===== Auto Play Page =====");
+    display_show_line(1,"auto play fake images");
+    display_show_line(2,"b. Back to main menu");
+    display_show_line(3,"q. Quit");
+    display_show_line(4,"input: ");
+    display_refresh();
 
     ch = getchar();
 

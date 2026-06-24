@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "page/image_browsing_page.h"
+#include "display/display.h"
 #include "page/page.h"
 
 void image_browsing_page_run(AppState *app)
@@ -10,13 +11,14 @@ void image_browsing_page_run(AppState *app)
     if (app == NULL)
         return;
 
-    printf("\n===== Image Browsing Page =====\n");
-    printf("fake image 1: test1.jpg\n");
-    printf("fake image 2: test2.jpg\n");
-    printf("v. View image\n");
-    printf("b. Back to main menu\n");
-    printf("q. Quit\n");
-    printf("input: ");
+    display_show_line(0,"===== Image Browsing Page =====");
+    display_show_line(1,"fake image 1: test1.jpg");
+    display_show_line(2,"fake image 2: test2.jpg");
+    display_show_line(3,"v. View image");
+    display_show_line(4,"b. Back to main menu");
+    display_show_line(5,"q. Quit");
+    display_show_line(6,"input: ");
+    display_refresh();
 
     ch = getchar();
 

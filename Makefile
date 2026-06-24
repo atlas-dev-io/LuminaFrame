@@ -10,7 +10,8 @@ SRCS = main.c \
        src/page/main_menu_page.c \
        src/page/image_browsing_page.c \
        src/page/image_viewing_page.c \
-       src/page/auto_play_page.c
+       src/page/auto_play_page.c \
+			 src/display/display.c
 
 all:
 	mkdir -p $(BUILD_DIR)
