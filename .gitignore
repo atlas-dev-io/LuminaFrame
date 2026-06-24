@@ -1,2 +1,3 @@
 lumina_frame
   *.o
+build/
