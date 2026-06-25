@@ -11,7 +11,8 @@ SRCS = main.c \
        src/page/image_browsing_page.c \
        src/page/image_viewing_page.c \
        src/page/auto_play_page.c \
-			 src/display/display.c
+			 src/display/display.c \
+			 src/input/input.c
 
 all:
 	mkdir -p $(BUILD_DIR)

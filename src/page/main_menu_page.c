@@ -3,10 +3,11 @@
 #include "page/page.h"
 #include "page/main_menu_page.h"
 #include "display/display.h"
+#include "input/input.h"
 
 void main_menu_page_run(AppState *app)
 {
-    int ch;
+    InputEvent event;
 
     if (app == NULL)
         return;
@@ -19,12 +20,19 @@ void main_menu_page_run(AppState *app)
     display_show_line(5,"input: ");
     display_refresh();
 
-    ch = getchar();
+    event = input_read_event();
 
-    while (getchar() != '\n')
-        ;
+    if (event.type == INPUT_EVENT_QUIT) {
+        app -> current_page = PAGE_EXIT;
+        return;
+    }
 
-    switch (ch) {
+    if (event.type != INPUT_EVENT_KEY) {
+        app -> current_page = PAGE_MAIN_MENU;
+        return;
+    }
+
+    switch (event.key) {
     case '1':
         app->current_page = PAGE_IMAGE_BROWSING;
         break;

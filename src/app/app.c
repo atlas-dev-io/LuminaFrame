@@ -7,7 +7,7 @@
 #include "page/image_viewing_page.h"
 #include "page/main_menu_page.h"
 #include "display/display.h"
-
+#include "input/input.h"
 
 void app_init(AppState *app)
 {
@@ -19,6 +19,11 @@ void app_init(AppState *app)
     if (display_init() < 0) {
         app -> current_page = PAGE_EXIT;
         return ;
+    }
+
+    if(input_init() < 0){
+        display_close();
+        app -> current_page = PAGE_EXIT;
     }
 }
 
@@ -52,11 +57,13 @@ void app_run(AppState *app)
                 break;
 
             default:
-                app->current_page = PAGE_EXIT;
+                app-> current_page = PAGE_EXIT;
                 break;
         }
 
     }
+
+    input_close();
     display_close();
     printf("LuminaFrame exit.\n");
 }
