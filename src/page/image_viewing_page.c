@@ -33,16 +33,16 @@ void image_viewing_page_run(AppState *app)
 
 
     switch (event.key) {
-    case 'b':
-        app->current_page = PAGE_IMAGE_BROWSING;
-        break;
+        case 'b':
+            app->current_page = PAGE_IMAGE_BROWSING;
+            break;
 
-    case 'q':
-        app->current_page = PAGE_EXIT;
-        break;
+        case 'q':
+            app->current_page = PAGE_EXIT;
+            break;
 
-    default:
-        app->current_page = PAGE_IMAGE_VIEWING;
-        break;
+        default:
+            app->current_page = PAGE_IMAGE_VIEWING;
+            break;
     }
 }

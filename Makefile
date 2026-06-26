@@ -12,7 +12,9 @@ SRCS = main.c \
        src/page/image_viewing_page.c \
        src/page/auto_play_page.c \
 			 src/display/display.c \
-			 src/input/input.c
+			 src/input/input.c \
+		   src/browser/browser.c
+
 
 all:
 	mkdir -p $(BUILD_DIR)

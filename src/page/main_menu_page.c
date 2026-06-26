@@ -33,24 +33,24 @@ void main_menu_page_run(AppState *app)
     }
 
     switch (event.key) {
-    case '1':
-        app->current_page = PAGE_IMAGE_BROWSING;
-        break;
+        case '1':
+            app->current_page = PAGE_IMAGE_BROWSING;
+            break;
 
-    case '2':
-        app->current_page = PAGE_IMAGE_VIEWING;
-        break;
+        case '2':
+            app->current_page = PAGE_IMAGE_VIEWING;
+            break;
 
-    case '3':
-        app->current_page = PAGE_AUTO_PLAY;
-        break;
+        case '3':
+            app->current_page = PAGE_AUTO_PLAY;
+            break;
 
-    case 'q':
-        app->current_page = PAGE_EXIT;
-        break;
+        case 'q':
+            app->current_page = PAGE_EXIT;
+            break;
 
-    default:
-        app->current_page = PAGE_MAIN_MENU;
-        break;
+        default:
+            app->current_page = PAGE_MAIN_MENU;
+            break;
     }
 }

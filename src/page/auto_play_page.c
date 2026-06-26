@@ -32,16 +32,16 @@ void auto_play_page_run(AppState *app)
     }
 
     switch (event.key) {
-    case 'b':
-        app->current_page = PAGE_MAIN_MENU;
-        break;
+        case 'b':
+            app->current_page = PAGE_MAIN_MENU;
+            break;
 
-    case 'q':
-        app->current_page = PAGE_EXIT;
-        break;
+        case 'q':
+            app->current_page = PAGE_EXIT;
+            break;
 
-    default:
-        app->current_page = PAGE_AUTO_PLAY;
-        break;
+        default:
+            app->current_page = PAGE_AUTO_PLAY;
+            break;
     }
 }
