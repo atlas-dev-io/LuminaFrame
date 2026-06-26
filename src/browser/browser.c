@@ -2,6 +2,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+#include <strings.h>
 #include <sys/stat.h>
 
 #include "browser/browser.h"
@@ -37,6 +38,34 @@ static int browser_is_regular_file(const char *dir_path, const char *name)
         return 0;
 
     return S_ISREG(st.st_mode);
+}
+
+static int browser_is_image_file(const char *name)
+{
+    const char *dot;
+    if(NULL == name)
+        return 0;
+
+    dot = strrchr(name, '.');
+    if(NULL == dot)
+        return 0;
+
+    if(name == dot)
+        return 0;
+
+    if('\0' == dot[1])
+        return 0;
+
+    if(0 == strcasecmp(dot, ".bmp"))
+        return 1;
+
+    if(0 == strcasecmp(dot, ".jpg"))
+        return 1;
+
+    if(0 == strcasecmp(dot, ".jpeg"))
+        return 1;
+
+    return 0;
 }
 
 void browser_init(BrowserState *browser)
@@ -78,6 +107,9 @@ int browser_load_dir(BrowserState *browser, const char *dir_path)
             continue;
 
         if(!browser_is_regular_file(dir_path, entry -> d_name))
+            continue;
+
+        if(!browser_is_image_file(entry -> d_name))
             continue;
 
         snprintf(browser -> entries[browser -> entry_count].name,
