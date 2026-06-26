@@ -44,7 +44,7 @@ InputEvent input_read_event(void)
 }
 
 
-void input_close()
+void input_close(void)
 {
 
 }
