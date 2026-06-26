@@ -14,7 +14,8 @@ void app_init(AppState *app)
     if(NULL == app)
         return;
 
-    app -> current_page = PAGE_MAIN_MENU;
+    app -> current_page          = PAGE_MAIN_MENU;
+    app -> current_file_path[0]  = '\0'          ;
 
     if (display_init() < 0) {
         app -> current_page = PAGE_EXIT;
@@ -24,6 +25,7 @@ void app_init(AppState *app)
     if(input_init() < 0){
         display_close();
         app -> current_page = PAGE_EXIT;
+        return ;
     }
 }
 
