@@ -48,5 +48,13 @@ void app_init(AppState *app);
  */
 void app_run(AppState *app);
 
+/**
+ * @brief Update current file path from browser selected entry.
+ *
+ * @param app Application state object.
+ *
+ * @return 0 on success, -1 on failure.
+ */
+int app_set_current_file_from_browser(AppState *app);
 
 #endif /* LUMINAFRAME_APP_H */

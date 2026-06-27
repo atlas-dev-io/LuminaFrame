@@ -81,4 +81,52 @@ size_t browser_get_count(const BrowserState *browser);
 const char *browser_get_entry(const BrowserState *browser, size_t index);
 
 
+/**
+ * @brief Get current scanned directory.
+ *
+ * @param browser Browser state object.
+ *
+ * @return Current directory string, or NULL if browser is invalid.
+ */
+const char *browser_get_current_dir(const BrowserState *browser);
+
+/**
+ * @brief Select file entry by index.
+ *
+ * @param browser Browser state object.
+ * @param index File entry index.
+ *
+ * @return 0 on success, -1 on failure.
+ */
+int browser_select_entry(BrowserState *browser, size_t index);
+
+
+/**
+ * @brief Select next file entry.
+ *
+ * @param browser Browser state object.
+ *
+ * @return 0 on success, -1 if there is no next entry.
+ */
+int browser_select_next(BrowserState *browser);
+
+/**
+ * @brief Select previous file entry.
+ *
+ * @param browser Browser state object.
+ *
+ * @return 0 on success, -1 if there is no previous entry.
+ */
+int browser_select_prev(BrowserState *browser);
+
+/**
+ * @brief Get currently selected file name.
+ *
+ * @param browser Browser state object.
+ *
+ * @return Selected file name string, or NULL if no valid entry is selected.
+ */
+const char *browser_get_selected_entry(const BrowserState *browser);
+
+
 #endif /* LUMINAFRAME_BROWSER_H */

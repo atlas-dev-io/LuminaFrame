@@ -12,31 +12,6 @@
 
 #define IMAGE_BROWSING_MAX_SHOW 8
 
-
-static int image_browsing_set_current_file(AppState *app,
-                                            const BrowserState *browser,
-                                            const char *file_name)
-{
-    int ret;
-
-    if(NULL == app || NULL == browser || NULL == file_name)
-        return -1;
-
-    ret = snprintf(app ->current_file_path, 
-                   sizeof(app -> current_file_path), 
-                   "%s/%s", 
-                   browser -> current_dir,
-                   file_name);
-
-    if(ret < 0 || (size_t)ret >= sizeof(app -> current_file_path)){
-        app ->current_file_path[0] = '\0';
-        return -1;
-    }
-
-    return 0;
-}
-
-
 void image_browsing_page_run(AppState *app)
 {
     InputEvent      event       ;
@@ -46,9 +21,14 @@ void image_browsing_page_run(AppState *app)
     size_t          show_count  ;
     char            line[1024]  ;
     const char      *file_name  ;
+    const char      *dir_path   ;
 
     if (app == NULL)
         return;
+
+    dir_path = browser_get_current_dir(&app -> browser);
+    if(NULL == dir_path)
+        dir_path = "";
 
     display_clear();
     display_show_line(0,"===== Image Browsing Page =====");
@@ -89,8 +69,8 @@ void image_browsing_page_run(AppState *app)
         return ;
     }
 
-    count       = browser_get_count(&app -> browser);
-    show_count  = count                               ;
+    count       = browser_get_count(&app -> browser)      ;
+    show_count  = count                                            ;
 
     if(show_count > IMAGE_BROWSING_MAX_SHOW)
         show_count = IMAGE_BROWSING_MAX_SHOW;
@@ -98,7 +78,7 @@ void image_browsing_page_run(AppState *app)
     snprintf(line, 
              sizeof(line), 
              "Directory: %s", 
-             app -> browser .current_dir);
+             dir_path);
     display_show_line(1, line);
 
     snprintf(line, 
@@ -156,16 +136,13 @@ void image_browsing_page_run(AppState *app)
                 index = (size_t)(event.key -'1');
 
                 if(index < show_count){
-                    file_name = browser_get_entry(&app -> browser, index);
-
-                    app -> browser.selected_index = index;
-
-                    if(0 == image_browsing_set_current_file(app,
-                                                            &app -> browser,
-                                                            file_name))
+                    if(0 == browser_select_entry(&app -> browser, 
+                                                 index))
                     {
-                        app -> current_page = PAGE_IMAGE_VIEWING;
-                        break ;
+                        if(0 == app_set_current_file_from_browser(app)){
+                            app -> current_page = PAGE_IMAGE_VIEWING;
+                            break;
+                        }
                     }
                 }
             }

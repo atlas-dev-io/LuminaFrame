@@ -174,3 +174,74 @@ const char *browser_get_entry(const BrowserState *browser, size_t index)
     return browser -> entries[index].name;
 }
 
+const char *browser_get_current_dir(const BrowserState *browser)
+{
+    if(NULL == browser)
+        return NULL;
+
+    return browser -> current_dir;
+}
+
+int browser_select_entry(BrowserState *browser, size_t index)
+{
+    if(NULL == browser)
+        return -1;
+
+    if(index >= browser -> entry_count)
+        return -1;
+
+    browser -> selected_index = index;
+
+    return 0;
+}
+
+int browser_select_next(BrowserState *browser)
+{
+    if(NULL == browser)
+        return -1;
+
+    if(0 == browser -> entry_count)
+        return -1;
+
+    if(browser -> selected_index + 1 >= browser -> entry_count)
+        return -1;
+
+    browser -> selected_index++;
+
+    return 0;
+}
+
+int browser_select_prev(BrowserState *browser)
+{
+    if(NULL == browser)
+        return -1;
+
+    if(0 == browser -> entry_count)
+        return -1;
+
+    if(0 == browser -> selected_index)
+        return -1;
+
+    browser -> selected_index--;
+
+    return 0;
+
+}
+
+const char *browser_get_selected_entry(const BrowserState *browser)
+{
+    if(NULL == browser)
+        return NULL;
+
+    if(0 == browser -> selected_index)
+        return NULL;
+
+    if(browser -> selected_index >= browser -> entry_count)
+        return NULL;
+
+    return browser_get_entry(browser, browser -> selected_index);
+}
+
+
+
+

@@ -71,3 +71,39 @@ void app_run(AppState *app)
     display_close();
     printf("LuminaFrame exit.\n");
 }
+
+int app_set_current_file_from_browser(AppState *app)
+{
+    const char *dir_path;
+    const char *file_name;
+    int ret;
+
+    if(NULL == app)
+        return -1;
+
+    dir_path  = browser_get_current_dir(&app -> browser);
+    file_name = browser_get_selected_entry(&app -> browser);
+
+    if(NULL == dir_path || NULL == file_name){
+        app -> current_file_path[0] = '\0';
+        return -1;
+    }
+
+    if('\0' == dir_path[0]){
+        app -> current_file_path[0] = '\0';
+        return -1;
+    }
+
+    ret = snprintf(app -> current_file_path,
+                   sizeof(app -> current_file_path),
+                   "%s/%s",
+                   dir_path,
+                   file_name);
+
+    if(ret < 0 || (size_t)ret >= sizeof(app -> current_file_path)){
+        app -> current_file_path[0] = '\0';
+        return -1;
+    }
+
+    return 0;
+}

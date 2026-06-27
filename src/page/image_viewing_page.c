@@ -1,7 +1,7 @@
-#include <stdio.h>
 
 #include "app/app.h"
 #include "page/image_viewing_page.h"
+#include "browser/browser.h"
 #include "display/display.h"
 #include "page/page.h"
 #include "input/input.h"
@@ -23,9 +23,11 @@ void image_viewing_page_run(AppState *app)
     else
         display_show_line(2, app -> current_file_path);
 
-    display_show_line(4,"b. Back to image browsing");
-    display_show_line(5,"q. Quit");
-    display_show_line(6,"input: ");
+    display_show_line(4,"p. Previous image");
+    display_show_line(5,"n. Next image");
+    display_show_line(6,"b. Back to image browsing");
+    display_show_line(7,"q. Quit");
+    display_show_line(8,"input: ");
     display_refresh();
 
     event = input_read_event();
@@ -42,6 +44,20 @@ void image_viewing_page_run(AppState *app)
 
 
     switch (event.key) {
+        case 'p':
+            if(0 == browser_select_prev(&app -> browser))
+                app_set_current_file_from_browser(app);
+
+            app -> current_page = PAGE_IMAGE_VIEWING;
+            break;
+
+        case 'n':
+            if(0 == browser_select_next(&app -> browser))
+                app_set_current_file_from_browser(app);
+
+            app -> current_page = PAGE_IMAGE_VIEWING;
+            break;
+
         case 'b':
             app-> current_page = PAGE_IMAGE_BROWSING;
             break;
