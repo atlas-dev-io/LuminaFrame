@@ -1,6 +1,7 @@
 #include <dirent.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <strings.h>
 #include <sys/stat.h>
@@ -68,6 +69,32 @@ static int browser_is_image_file(const char *name)
     return 0;
 }
 
+static int browser_compare_entry(const void *left, const void *right)
+{
+    const BrowserEntry *left_entry  = left  ;
+    const BrowserEntry *right_entry = right ;
+
+    int ret = strcasecmp(left_entry -> name, right_entry -> name);
+    if(0 != ret)
+        return ret;
+
+    return strcmp(left_entry -> name, right_entry -> name);
+}
+
+static void browser_sort_entries(BrowserState *browser)
+{
+    if(NULL == browser)
+        return;
+
+    if(browser ->entry_count <= 1)
+        return;
+
+    qsort(browser -> entries, 
+          browser -> entry_count, 
+          sizeof(browser -> entries[0]), 
+          browser_compare_entry);
+}
+
 void browser_init(BrowserState *browser)
 {
     if(NULL == browser)
@@ -121,6 +148,8 @@ int browser_load_dir(BrowserState *browser, const char *dir_path)
     }
 
     closedir(dir);
+    browser_sort_entries(browser);
+
     return 0;
 }
 
