@@ -39,7 +39,6 @@ static int image_browsing_set_current_file(AppState *app,
 
 void image_browsing_page_run(AppState *app)
 {
-    BrowserState    browser     ;
     InputEvent      event       ;
     size_t          count       ;
     size_t          i           ;
@@ -50,13 +49,11 @@ void image_browsing_page_run(AppState *app)
 
     if (app == NULL)
         return;
-    
-    browser_init(&browser);
 
     display_clear();
     display_show_line(0,"===== Image Browsing Page =====");
 
-    if(browser_load_dir(&browser, ".") < 0){
+    if(browser_load_dir(&app -> browser, ".") < 0){
         display_show_line(1, "Failed to load current directory.");
         display_show_line(2,"b. Back to main menu");
         display_show_line(3,"q. Quit");
@@ -92,7 +89,7 @@ void image_browsing_page_run(AppState *app)
         return ;
     }
 
-    count       = browser_get_count(&browser);
+    count       = browser_get_count(&app -> browser);
     show_count  = count                               ;
 
     if(show_count > IMAGE_BROWSING_MAX_SHOW)
@@ -101,7 +98,7 @@ void image_browsing_page_run(AppState *app)
     snprintf(line, 
              sizeof(line), 
              "Directory: %s", 
-             browser .current_dir);
+             app -> browser .current_dir);
     display_show_line(1, line);
 
     snprintf(line, 
@@ -111,10 +108,10 @@ void image_browsing_page_run(AppState *app)
     display_show_line(2, line);
 
     if(0 == show_count)
-        display_show_line(3, "No ordinary files found.");
+        display_show_line(3, "No image files found.");
     else{
         for (i = 0; i < show_count; i++) {
-            file_name = browser_get_entry(&browser, i);
+            file_name = browser_get_entry(&app -> browser, i);
             if(NULL == file_name)
                 continue;
 
@@ -159,10 +156,12 @@ void image_browsing_page_run(AppState *app)
                 index = (size_t)(event.key -'1');
 
                 if(index < show_count){
-                    file_name = browser_get_entry(&browser, index);
+                    file_name = browser_get_entry(&app -> browser, index);
+
+                    app -> browser.selected_index = index;
 
                     if(0 == image_browsing_set_current_file(app,
-                                                   &browser,
+                                                            &app -> browser,
                                                             file_name))
                     {
                         app -> current_page = PAGE_IMAGE_VIEWING;

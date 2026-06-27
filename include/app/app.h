@@ -2,6 +2,7 @@
 #define LUMINAFRAME_APP_H
 
 #include "page/page.h"
+#include "browser/browser.h"
 
 
 #define APP_MAX_PATH_LEN 512
@@ -19,9 +20,15 @@ typedef struct{
     /** Current selected file path. */
     char current_file_path[APP_MAX_PATH_LEN];
 
+    /*
+     * Browser state shared by image browsing page and image viewing page.
+     *
+     * It keeps scanned image list, current directory, and selected index
+     * across page switching.
+     */
+    BrowserState browser;
+
     /* TODO: add global state. */
-    /* TODO: selected file. */
-    /* TODO: current directory. */
     /* TODO: user input event. */
 } AppState;
 

@@ -50,8 +50,9 @@ void browser_init(BrowserState *browser);
 /**
  * @brief Load image files from directory.
  *
- * Scan the specified directory, skip "." and "..", and save image
- * file names into browser state.
+ * Scan the specified directory, skip "." and "..", filter ordinary image
+ * files by extension, sort them by file name, and save file names into
+ * browser state.
  *
  * @param browser Browser state object.
  * @param dir_path Directory path to scan.

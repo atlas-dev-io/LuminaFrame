@@ -17,6 +17,8 @@ void app_init(AppState *app)
     app -> current_page          = PAGE_MAIN_MENU;
     app -> current_file_path[0]  = '\0'          ;
 
+    browser_init(&app -> browser);
+
     if (display_init() < 0) {
         app -> current_page = PAGE_EXIT;
         return ;
