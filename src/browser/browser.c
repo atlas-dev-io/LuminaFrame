@@ -233,7 +233,7 @@ const char *browser_get_selected_entry(const BrowserState *browser)
     if(NULL == browser)
         return NULL;
 
-    if(0 == browser -> selected_index)
+    if(0 == browser -> entry_count)
         return NULL;
 
     if(browser -> selected_index >= browser -> entry_count)
