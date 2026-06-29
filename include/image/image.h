@@ -40,6 +40,24 @@ void image_init(Image *image);
 int image_load(const char *path, Image *image);
 
 /**
+ * @brief Resize image to fit inside max size.
+ *
+ * Keep source image aspect ratio and use nearest-neighbor sampling.
+ * The first version only supports 24-bit RGB image.
+ *
+ * @param src Source image object.
+ * @param max_width Max output width.
+ * @param max_height Max output height.
+ * @param dst Destination image object to store resized data.
+ *
+ * @return 0 on success, -1 on failure.
+ */
+int image_resize_to_fit(const Image *src,
+                        int max_width,
+                        int max_height,
+                        Image *dst);
+
+/**
  * @brief Free decoded image data.
  *
  * @param image Image object.
