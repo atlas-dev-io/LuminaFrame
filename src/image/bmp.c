@@ -29,7 +29,7 @@ static uint32_t bmp_read_le32(const unsigned char *buf)
                       ((uint32_t)buf[3] << 24));
 }
 
-static uint32_t bmp_read_le32s(const unsigned char *buf)
+static int32_t bmp_read_le32s(const unsigned char *buf)
 {
     return (int32_t)bmp_read_le32(buf);
 }
@@ -192,7 +192,12 @@ int bmp_load(const char *path, Image *image)
                       fp))
             goto fail;
 
-        dest_line = image -> pixels + y * file_line_bytes;
+        /*
+         * file_line_bytes is the padded BMP row size.
+         * image_line_bytes is the decoded RGB row size.
+         * Use image_line_bytes when writing into image->pixels.
+         */
+        dest_line = image -> pixels + (size_t)y * image_line_bytes;
 
         for (x = 0; x < width; x++) {
 
