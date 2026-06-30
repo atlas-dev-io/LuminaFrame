@@ -1,33 +1,95 @@
 #include <stdio.h>
+#include <linux/fb.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
 
 #include "display/display.h"
 
+static DisplayState g_display;
 
-#define DISPLAY_SIMULATED_WIDTH  800
-#define DISPLAY_SIMULATED_HEIGHT 480
+static void display_set_simulated_state(void)
+{
+    g_display.fd              = DISPLAY_INVALID_FD            ;
+    g_display.width           = DISPLAY_SIMULATED_WIDTH       ;
+    g_display.height          = DISPLAY_SIMULATED_HEIGHT      ;
+    g_display.bpp             = DISPLAY_SIMULATED_BPP         ;
+    g_display.line_length     = DISPLAY_SIMULATED_WIDTH *
+                                (DISPLAY_SIMULATED_BPP  / 8)  ;
+    g_display.is_framebuffer  = 0                             ;
+}
 
 int display_init(void)
 {
+    int                       fd  ;
+    struct  fb_var_screeninfo var ;
+    struct  fb_fix_screeninfo fix ;
+
+    /*
+     * Start with terminal simulated display.
+     *
+     * If framebuffer initialization fails, the program can still run
+     * on PC terminal for logic testing.
+     */
+    display_set_simulated_state();
+
+    fd = open(DISPLAY_FB_DEVICE, O_RDWR);
+    if(0 > fd){
+        printf("[display] framebuffer %s not found,"
+               "use simulated display %dx%d\n",
+               DISPLAY_FB_DEVICE,
+               g_display.width,
+               g_display.height);
+        
+        return 0;
+    }
+
+    if(0 > ioctl(fd, FBIOGET_VSCREENINFO, &var)){
+        printf("[display] FBIOGET_VSCREENINFO failed,"
+               "use simulated display\n");
+        close(fd);
+        return 0;
+    }
+
+    if(0 > ioctl(fd, FBIOGET_FSCREENINFO, &fix)){
+        printf("[display] FBIOGET_FSCREENINFO failed,"
+               "use simulated display\n");
+        close(fd);
+        return 0;
+    }
+
+    g_display.fd              = fd                      ;
+    g_display.width           = (int)var.xres           ;
+    g_display.height          = (int)var.yres           ;
+    g_display.bpp             = (int)var.bits_per_pixel ;
+    g_display.line_length     = (int)fix.line_length    ;
+    g_display.is_framebuffer  = 1                       ;
+
+    printf("[display] framebuffer: %s, %dx%d, %dbpp,"
+           "line_length=%d\n",
+           DISPLAY_FB_DEVICE,
+           g_display.width,
+           g_display.height,
+           g_display.bpp,
+           g_display.line_length);
+
     return 0; 
 }
 
 
 int display_get_width(void)
 {
-    /*
-     * Terminal display backend has no real pixel size.
-     * Return a simulated LCD width for image resize testing.
-     */
-    return DISPLAY_SIMULATED_WIDTH;
+    return g_display.width;
 }
 
 int display_get_height(void)
 {
-    /*
-     * Terminal display backend has no real pixel size.
-     * Return a simulated LCD height for image resize testing.
-     */
-    return DISPLAY_SIMULATED_HEIGHT;
+    return g_display.height;
+}
+
+int display_get_bpp(void)
+{
+    return g_display.bpp;
 }
 
 void display_clear(void)
@@ -61,6 +123,11 @@ void display_refresh(void)
 
 void display_close(void)
 {
+    if(g_display.is_framebuffer && 0 <= g_display.fd){
+        close(g_display.fd);
+        g_display.fd = DISPLAY_INVALID_FD;
+    }
+
     printf("\033[0m");
     fflush(stdout);
 }

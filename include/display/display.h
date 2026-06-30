@@ -1,6 +1,23 @@
 #ifndef LUMINAFRAME_DISPLAY_H
 #define LUMINAFRAME_DISPLAY_H
 
+
+#define DISPLAY_FB_DEVICE         "/dev/fb0"
+#define DISPLAY_SIMULATED_WIDTH   800
+#define DISPLAY_SIMULATED_HEIGHT  480
+#define DISPLAY_SIMULATED_BPP     32
+#define DISPLAY_INVALID_FD        -1
+
+typedef struct{
+    int fd;
+    int width;
+    int height;
+    int bpp;
+    int line_length;
+    int is_framebuffer;
+} DisplayState;
+
+
 /**
  * @brief Initialize display module.
  *
@@ -29,6 +46,12 @@ int display_get_width(void);
  */
 int display_get_height(void);
 
+/**
+ * @brief Get display bits per pixel.
+ *
+ * @return Display bits per pixel.
+ */
+int display_get_bpp(void);
 
 /**
  * @brief Clear display content.
