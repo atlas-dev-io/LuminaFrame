@@ -8,6 +8,28 @@
  */
 int display_init(void);
 
+
+/**
+ * @brief Get display width.
+ *
+ * Terminal version returns simulated screen width.
+ * Framebuffer version will return real LCD width.
+ *
+ * @return Display width in pixels.
+ */
+int display_get_width(void);
+
+/**
+ * @brief Get display height.
+ *
+ * Terminal version returns simulated screen height.
+ * Framebuffer version will return real LCD height.
+ *
+ * @return Display height in pixels.
+ */
+int display_get_height(void);
+
+
 /**
  * @brief Clear display content.
  */

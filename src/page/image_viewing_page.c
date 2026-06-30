@@ -10,29 +10,29 @@
 #include "input/input.h"
 
 
-/*
- * Simulated screen area.
- *
- * This step only verifies the memory chain:
- * image_load() -> image_resize_to_fit() -> show resized information.
- *
- * Framebuffer drawing will be added later.
- */
-#define IMAGE_VIEWING_FIT_WIDTH   800
-#define IMAGE_VIEWING_FIT_HEIGHT  480
-
 void image_viewing_page_run(AppState *app)
 {
     InputEvent    event       ;
     Image         image       ;
     Image         resize      ;
     char          line[1024]  ;
+    int           fit_height  ;
+    int           fit_width   ;
 
     if (NULL == app)
         return;
 
     image_init(&image);
     image_init(&resize);
+
+    /*
+     * Get display size from display module.
+     *
+     * Current terminal version returns simulated size.
+     * Future framebuffer version will return real LCD size.
+     */
+    fit_width   = display_get_width();
+    fit_height  = display_get_height();
 
     display_clear();
     display_show_line(0,"===== Image Viewing Page =====");
@@ -59,14 +59,14 @@ void image_viewing_page_run(AppState *app)
             snprintf(line, 
                      sizeof(line), 
                      "Fit area: %dx%d",
-                     IMAGE_VIEWING_FIT_WIDTH,
-                     IMAGE_VIEWING_FIT_HEIGHT);
+                     fit_width,
+                     fit_height);
 
             display_show_line(4, line);
 
           if(0 == image_resize_to_fit(&image, 
-                                      IMAGE_VIEWING_FIT_WIDTH, 
-                                      IMAGE_VIEWING_FIT_HEIGHT, 
+                                      fit_width, 
+                                      fit_height, 
                                       &resize))
           {
               snprintf(line, 

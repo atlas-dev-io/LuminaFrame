@@ -3,9 +3,31 @@
 #include "display/display.h"
 
 
+#define DISPLAY_SIMULATED_WIDTH  800
+#define DISPLAY_SIMULATED_HEIGHT 480
+
 int display_init(void)
 {
     return 0; 
+}
+
+
+int display_get_width(void)
+{
+    /*
+     * Terminal display backend has no real pixel size.
+     * Return a simulated LCD width for image resize testing.
+     */
+    return DISPLAY_SIMULATED_WIDTH;
+}
+
+int display_get_height(void)
+{
+    /*
+     * Terminal display backend has no real pixel size.
+     * Return a simulated LCD height for image resize testing.
+     */
+    return DISPLAY_SIMULATED_HEIGHT;
 }
 
 void display_clear(void)
