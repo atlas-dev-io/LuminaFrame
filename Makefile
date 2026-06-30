@@ -1,9 +1,13 @@
 CC = gcc
 CFLAGS = -std=c11 -Wall -Wextra -g -I./include
+LDFLAGS =
 
 TARGET = lumina_frame
 BUILD_DIR = build
 TEST_IMAGE_TARGET = test_image
+ARM_CC ?= arm-linux-gnueabihf-gcc
+ARM_TARGET = lumina_frame_arm
+ARM_STATIC_LDFLAGS = -static
 
 SRCS = main.c \
        src/app/app.c \
@@ -22,18 +26,22 @@ TEST_IMAGE_SRCS = tests/test_image.c \
                   src/image/image.c \
                   src/image/bmp.c
 
-.PHONY: all run test test-image clean
+.PHONY: all run arm-static test test-image clean
 
 all:
 	mkdir -p $(BUILD_DIR)
-	$(CC) $(CFLAGS) $(SRCS) -o $(BUILD_DIR)/$(TARGET)
+	$(CC) $(CFLAGS) $(SRCS) $(LDFLAGS) -o $(BUILD_DIR)/$(TARGET)
 
 run: all
 	./$(BUILD_DIR)/$(TARGET)
 
+arm-static:
+	mkdir -p $(BUILD_DIR)
+	$(ARM_CC) $(CFLAGS) $(SRCS) $(ARM_STATIC_LDFLAGS) -o $(BUILD_DIR)/$(ARM_TARGET)
+
 test-image:
 	mkdir -p $(BUILD_DIR)
-	$(CC) $(CFLAGS) $(TEST_IMAGE_SRCS) -o $(BUILD_DIR)/$(TEST_IMAGE_TARGET)
+	$(CC) $(CFLAGS) $(TEST_IMAGE_SRCS) $(LDFLAGS) -o $(BUILD_DIR)/$(TEST_IMAGE_TARGET)
 	./$(BUILD_DIR)/$(TEST_IMAGE_TARGET)
 
 test: test-image
