@@ -9,16 +9,30 @@
 #include "page/page.h"
 #include "input/input.h"
 
+
+/*
+ * Simulated screen area.
+ *
+ * This step only verifies the memory chain:
+ * image_load() -> image_resize_to_fit() -> show resized information.
+ *
+ * Framebuffer drawing will be added later.
+ */
+#define IMAGE_VIEWING_FIT_WIDTH   800
+#define IMAGE_VIEWING_FIT_HEIGHT  480
+
 void image_viewing_page_run(AppState *app)
 {
-    InputEvent event;
-    Image      image;
-    char       line[1024];
+    InputEvent    event       ;
+    Image         image       ;
+    Image         resize      ;
+    char          line[1024]  ;
 
     if (NULL == app)
         return;
 
     image_init(&image);
+    image_init(&resize);
 
     display_clear();
     display_show_line(0,"===== Image Viewing Page =====");
@@ -41,18 +55,48 @@ void image_viewing_page_run(AppState *app)
                      image.bpp);
 
             display_show_line(3, line);
-            display_show_line(4, "Decode: OK");
+
+            snprintf(line, 
+                     sizeof(line), 
+                     "Fit area: %dx%d",
+                     IMAGE_VIEWING_FIT_WIDTH,
+                     IMAGE_VIEWING_FIT_HEIGHT);
+
+            display_show_line(4, line);
+
+          if(0 == image_resize_to_fit(&image, 
+                                      IMAGE_VIEWING_FIT_WIDTH, 
+                                      IMAGE_VIEWING_FIT_HEIGHT, 
+                                      &resize))
+          {
+              snprintf(line, 
+                       sizeof(line), 
+                       "Scaled: %dx%d, %dbpp",
+                       resize.width,
+                       resize.height,
+                       resize.bpp);
+              
+              display_show_line(5, line);
+              display_show_line(6, "Resize: OK");
+          }else{
+              display_show_line(5, "Scaled: Failed");
+              display_show_line(6, "Resize: Failed");
+          }
+
+          display_show_line(7, "Decode: OK");
+
         }else
             display_show_line(3, "Decode: Failed");
     }
 
     image_free(&image);
+    image_free(&resize);
 
-    display_show_line(6,"p. Previous image");
-    display_show_line(7,"n. Next image");
-    display_show_line(8,"b. Back to image browsing");
-    display_show_line(9,"q. Quit");
-    display_show_line(10,"input: ");
+    display_show_line(9,"p. Previous image");
+    display_show_line(10,"n. Next image");
+    display_show_line(11,"b. Back to image browsing");
+    display_show_line(12,"q. Quit");
+    display_show_line(13,"input: ");
     display_refresh();
 
     event = input_read_event();
