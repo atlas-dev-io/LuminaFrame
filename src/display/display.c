@@ -2,7 +2,10 @@
 #include <linux/fb.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
+#include <sys/mman.h>
 #include <unistd.h>
+#include <stddef.h>
+
 
 #include "display/display.h"
 
@@ -17,13 +20,33 @@ static void display_set_simulated_state(void)
     g_display.line_length     = DISPLAY_SIMULATED_WIDTH *
                                 (DISPLAY_SIMULATED_BPP  / 8)  ;
     g_display.is_framebuffer  = 0                             ;
+    g_display.fb_mem          = NULL                          ;
+    g_display.fb_size         = 0                             ;
+}
+
+static void display_close_framebuffer(void)
+{
+    if(NULL != g_display.fb_mem){
+        munmap(g_display.fb_mem, g_display.fb_size);
+
+        g_display.fb_mem  = NULL;
+        g_display.fb_size = 0   ;
+    }
+
+    if(0 <= g_display.fd){
+        close(g_display.fd);
+        g_display.fd = DISPLAY_INVALID_FD;
+    }
+
+    g_display.is_framebuffer = 0;
 }
 
 int display_init(void)
 {
-    int                       fd  ;
-    struct  fb_var_screeninfo var ;
-    struct  fb_fix_screeninfo fix ;
+    int                       fd      ;
+    size_t                    fb_size ;
+    struct  fb_var_screeninfo var     ;
+    struct  fb_fix_screeninfo fix     ;
 
     /*
      * Start with terminal simulated display.
@@ -40,7 +63,7 @@ int display_init(void)
                DISPLAY_FB_DEVICE,
                g_display.width,
                g_display.height);
-        
+
         return 0;
     }
 
@@ -58,12 +81,48 @@ int display_init(void)
         return 0;
     }
 
+    if(0 == fix.line_length || 0 == var.yres_virtual){
+        printf("[display] invalid framebuffer size,"
+               "use simulated display\n");
+        close(fd);
+        return 0;
+    }
+
+    /*
+     * Map current virtual screen area.
+     *
+     * Do not use width * bytes_per_pixel here.
+     * Framebuffer line length may contain padding bytes.
+     */
+    fb_size = (size_t)fix.line_length * (size_t)var.yres_virtual;
+    if(0 == fb_size){
+        printf("[display] framebuffer mmap size is zero,"
+               "use simulated display\n");
+        close(fd);
+        return 0;
+    }
+
+    g_display.fb_mem = mmap(NULL,
+                            fb_size,
+                            PROT_READ | PROT_WRITE,
+                            MAP_SHARED,
+                            fd,
+                            0);
+    if(MAP_FAILED == g_display.fb_mem){
+        g_display.fb_mem = NULL;
+        printf("[display] mmap framebuffer failed,"
+               "use simulated display\n");
+        close(fd);
+        return 0;
+    }
+
     g_display.fd              = fd                      ;
     g_display.width           = (int)var.xres           ;
     g_display.height          = (int)var.yres           ;
     g_display.bpp             = (int)var.bits_per_pixel ;
     g_display.line_length     = (int)fix.line_length    ;
     g_display.is_framebuffer  = 1                       ;
+    g_display.fb_size         = fb_size                 ; 
 
     printf("[display] framebuffer: %s, %dx%d, %dbpp,"
            "line_length=%d\n",
@@ -72,6 +131,8 @@ int display_init(void)
            g_display.height,
            g_display.bpp,
            g_display.line_length);
+    printf("[display] framebuffer mapped: %zu bytes\n",
+           g_display.fb_size);
 
     return 0; 
 }
@@ -123,10 +184,7 @@ void display_refresh(void)
 
 void display_close(void)
 {
-    if(g_display.is_framebuffer && 0 <= g_display.fd){
-        close(g_display.fd);
-        g_display.fd = DISPLAY_INVALID_FD;
-    }
+    display_close_framebuffer();
 
     printf("\033[0m");
     fflush(stdout);

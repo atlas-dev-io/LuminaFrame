@@ -1,6 +1,8 @@
 #ifndef LUMINAFRAME_DISPLAY_H
 #define LUMINAFRAME_DISPLAY_H
 
+#include <stddef.h>
+
 
 #define DISPLAY_FB_DEVICE         "/dev/fb0"
 #define DISPLAY_SIMULATED_WIDTH   800
@@ -9,12 +11,30 @@
 #define DISPLAY_INVALID_FD        -1
 
 typedef struct{
-    int fd;
-    int width;
-    int height;
-    int bpp;
-    int line_length;
-    int is_framebuffer;
+
+    /* File descriptor of the display device */
+    int           fd            ;
+
+    /* Visible screen width */
+    int           width         ;
+
+    /* Visible screen height */
+    int           height        ;
+
+    /* Bits per pixel */
+    int           bpp           ;
+
+    /* Number of bytes per line in the framebuffer */
+    int           line_length   ;
+
+    /* Whether to use the framebuffer */
+    int           is_framebuffer;
+
+    /* The virtual address of the video memory obtained after mmap */
+    unsigned char *fb_mem       ;
+
+    /* mmap mapping length */
+    size_t        fb_size       ;
 } DisplayState;
 
 
