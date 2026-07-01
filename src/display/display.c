@@ -5,6 +5,7 @@
 #include <sys/mman.h>
 #include <unistd.h>
 #include <stddef.h>
+#include <string.h>
 
 #include "display/display.h"
 
@@ -71,6 +72,40 @@ static void display_close_framebuffer(void)
     }
 
     g_display.is_framebuffer = 0;
+}
+
+
+static void display_clear_terminal(void)
+{
+    /*
+     * ANSI escape sequence:
+     * \033[2J clears the screen.
+     * \033[H moves cursor to top-left.
+     */
+    printf("\033[2J");
+    printf("\033[H");
+}
+
+
+static void display_clear_framebuffer(void)
+{
+    if(!g_display.is_framebuffer)
+        return;
+
+    if(NULL == g_display.fb_mem || 0 == g_display.fb_size)
+        return;
+
+     /*
+     * Clear framebuffer to black.
+     *
+     * Writing zero works for common RGB framebuffer formats:
+     * RGB565  : 0x0000
+     * RGB888  : 0x000000
+     * XRGB8888: 0x00000000
+     *
+     * Later display_clear_color() may support custom colors.
+     */
+    memset(g_display.fb_mem, 0, g_display.fb_size);
 }
 
 int display_init(void)
@@ -187,13 +222,15 @@ int display_get_bpp(void)
 
 void display_clear(void)
 {
-/*
-     * ANSI escape sequence:
-     * \033[2J clears the screen.
-     * \033[H moves cursor to top-left.
+    display_clear_framebuffer();
+
+    /*
+     * Keep terminal output clean in current development stage.
+     *
+     * Text UI still uses terminal escape sequences.
+     * Framebuffer text rendering will be added later.
      */
-    printf("\033[2J");
-    printf("\033[H");
+    display_clear_terminal();
 }
 
 void display_show_line(int row, const char *text)
