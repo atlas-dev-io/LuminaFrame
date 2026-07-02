@@ -37,6 +37,50 @@ int display_get_height(void);
 int display_get_bpp(void);
 
 /**
+ * @brief Draw one pixel.
+ *
+ * The color uses RGB888 format. Display module converts it to the
+ * framebuffer pixel format internally.
+ *
+ * @param x Pixel x coordinate.
+ * @param y Pixel y coordinate.
+ * @param r Red component.
+ * @param g Green component.
+ * @param b Blue component.
+ *
+ * @return 0 on success, -1 on failure.
+ */
+int display_draw_pixel(int x,
+                       int y,
+                       unsigned char r,
+                       unsigned char g,
+                       unsigned char b);
+
+/**
+ * @brief Draw filled rectangle.
+ *
+ * The color uses RGB888 format. Display module converts it to the
+ * framebuffer pixel format internally.
+ *
+ * @param x Rectangle left position.
+ * @param y Rectangle top position.
+ * @param width Rectangle width.
+ * @param height Rectangle height.
+ * @param r Red component.
+ * @param g Green component.
+ * @param b Blue component.
+ *
+ * @return 0 on success, -1 on failure.
+ */
+int display_draw_rect(int x,
+                      int y,
+                      int width,
+                      int height,
+                      unsigned char r,
+                      unsigned char g,
+                      unsigned char b);
+
+/**
  * @brief Clear display content.
  */
 void display_clear(void);

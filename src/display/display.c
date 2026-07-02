@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <stddef.h>
 #include <string.h>
+#include <stdint.h>
 
 #include "display/display.h"
 
@@ -40,6 +41,18 @@ typedef struct{
 
     /* mmap mapping length */
     size_t        fb_size       ;
+
+    /* Framebuffer red component layout */
+    int           red_offset    ;
+    int           red_length    ;
+
+     /* Framebuffer green component layout */
+    int           green_offset  ;
+    int           green_length  ;
+
+    /* Framebuffer blue component layout */
+    int           blue_offset   ;
+    int           blue_length   ;
 } DisplayState;
 
 static DisplayState g_display;
@@ -55,6 +68,12 @@ static void display_set_simulated_state(void)
     g_display.is_framebuffer  = 0                             ;
     g_display.fb_mem          = NULL                          ;
     g_display.fb_size         = 0                             ;
+    g_display.red_offset      = 16                            ;
+    g_display.red_length      = 8                             ;
+    g_display.green_offset    = 8                             ;
+    g_display.green_length    = 8                             ;
+    g_display.blue_offset     = 0                             ;
+    g_display.blue_length     = 8                             ;
 }
 
 static void display_close_framebuffer(void)
@@ -106,6 +125,36 @@ static void display_clear_framebuffer(void)
      * Later display_clear_color() may support custom colors.
      */
     memset(g_display.fb_mem, 0, g_display.fb_size);
+}
+
+static unsigned int display_color_to_field(unsigned char value,
+                                           int length)
+{
+    if(0 >= length)
+        return 0;
+
+    if(8 <= length)
+        return (unsigned int )value << (length - 8);
+
+    return (unsigned int)value >> (8 - length);
+}
+
+static unsigned int display_make_pixel(unsigned char r,
+                                       unsigned char g,
+                                       unsigned char b)
+{
+    unsigned int pixel = 0;
+
+    pixel |= display_color_to_field(r, g_display.red_length)
+          << g_display.red_offset;
+
+    pixel |= display_color_to_field(g, g_display.green_length)
+          << g_display.green_offset;
+
+    pixel |= display_color_to_field(b, g_display.blue_length)
+          << g_display.blue_offset;
+
+    return pixel;
 }
 
 int display_init(void)
@@ -189,7 +238,13 @@ int display_init(void)
     g_display.bpp             = (int)var.bits_per_pixel ;
     g_display.line_length     = (int)fix.line_length    ;
     g_display.is_framebuffer  = 1                       ;
-    g_display.fb_size         = fb_size                 ; 
+    g_display.fb_size         = fb_size                 ;
+    g_display.red_offset      = (int)var.red.offset     ;
+    g_display.red_length      = (int)var.red.length     ;
+    g_display.green_offset    = (int)var.green.offset   ;
+    g_display.green_length    = (int)var.green.length   ;
+    g_display.blue_offset     = (int)var.blue.offset    ;
+    g_display.blue_length     = (int)var.blue.length    ;
 
     printf("[display] framebuffer: %s, %dx%d, %dbpp,"
            "line_length=%d\n",
@@ -201,7 +256,7 @@ int display_init(void)
     printf("[display] framebuffer mapped: %zu bytes\n",
            g_display.fb_size);
 
-    return 0; 
+    return 0;
 }
 
 
@@ -219,6 +274,113 @@ int display_get_bpp(void)
 {
     return g_display.bpp;
 }
+
+int display_draw_pixel(int x,
+                       int y,
+                       unsigned char r,
+                       unsigned char g,
+                       unsigned char b)
+{
+    unsigned char       *dst            ;
+    unsigned int        pixel           ;
+    int                 bytes_per_pixel ;
+
+    /*
+    * In terminal simulated mode, pixel drawing is a no-op.
+    * This keeps PC development working.
+    */
+    if(!g_display.is_framebuffer)
+        return 0;
+
+    if(NULL == g_display.fb_mem)
+        return -1;
+
+    if(0 > y || 0 > x)
+        return -1;
+
+    if(x >= g_display.width || y >= g_display.height)
+        return -1;
+
+    if(0 >= g_display.bpp)
+        return -1;
+
+    bytes_per_pixel = (g_display.bpp + 7) / 8;
+    if(0 >= bytes_per_pixel || bytes_per_pixel >4)
+        return -1;
+
+    dst = g_display.fb_mem +
+          (size_t)y * (size_t)g_display.line_length +
+          (size_t)x * (size_t)bytes_per_pixel;
+
+    pixel= display_make_pixel(r, g, b);
+
+    /*
+    * Current target is little-endian Linux framebuffer.
+    * Copy low bytes of packed pixel into framebuffer.
+    */
+    memcpy(dst,
+           &pixel,
+           (size_t)bytes_per_pixel);
+
+    return 0;
+}
+
+
+int display_draw_rect(int x,
+                      int y,
+                      int width,
+                      int height,
+                      unsigned char r,
+                      unsigned char g,
+                      unsigned char b)
+{
+    int x_start;
+    int y_start;
+    int x_end;
+    int y_end;
+    int col;
+    int row;
+
+    if(0 >= width || 0 >= height)
+        return -1;
+
+     /*
+     * In terminal simulated mode, rectangle drawing is a no-op.
+     * This keeps PC development working.
+     */
+    if(!g_display.is_framebuffer)
+        return 0;
+
+    x_start = x         ;
+    y_start = y         ;
+    x_end   = x + width ;
+    y_end   = y + height;
+
+    if(0 >= x_start)
+        x_start = 0;
+
+    if(0 >= y_start)
+        y_start = 0;
+
+    if(x_end > g_display.width)
+        x_end = g_display.width;
+
+    if(y_end > g_display.height)
+        y_end = g_display.height;
+
+    if(x_start >= x_end || y_start >= y_end)
+        return -1;
+
+    for(row = y_start; row < y_end; row++){
+        for(col = x_start; col < x_end; col++){
+            display_draw_pixel(col, row, r, g, b);
+        }
+    }
+
+    return 0;
+}
+
+
 
 void display_clear(void)
 {

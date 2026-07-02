@@ -35,6 +35,27 @@ void image_viewing_page_run(AppState *app)
     fit_height  = display_get_height();
 
     display_clear();
+
+
+    /***************************test*************************************/
+
+    /*
+    * Temporary framebuffer drawing test.
+    *
+    * This verifies display_draw_pixel() and display_draw_rect().
+    * Later it will be replaced by image drawing.
+    */
+    display_draw_rect(20, 20, 200, 120, 0, 128, 255);
+    display_draw_pixel(10, 10, 255, 0, 0);
+    display_draw_pixel(display_get_width() - 1,
+                   display_get_height() - 1,
+                   0,
+                   255,
+                   0);
+
+
+    /*******************************************************************/
+
     display_show_line(0,"===== Image Viewing Page =====");
     display_show_line(1,"Current file:");
 
@@ -44,11 +65,11 @@ void image_viewing_page_run(AppState *app)
     }else{
         display_show_line(2, app -> current_file_path);
 
-        if(0 == image_load(app -> current_file_path, 
+        if(0 == image_load(app -> current_file_path,
                            &image))
         {
-            snprintf(line, 
-                     sizeof(line), 
+            snprintf(line,
+                     sizeof(line),
                      "Image: %dx%d, %dbpp",
                      image.width,
                      image.height,
@@ -56,26 +77,26 @@ void image_viewing_page_run(AppState *app)
 
             display_show_line(3, line);
 
-            snprintf(line, 
-                     sizeof(line), 
+            snprintf(line,
+                     sizeof(line),
                      "Fit area: %dx%d",
                      fit_width,
                      fit_height);
 
             display_show_line(4, line);
 
-          if(0 == image_resize_to_fit(&image, 
-                                      fit_width, 
-                                      fit_height, 
+          if(0 == image_resize_to_fit(&image,
+                                      fit_width,
+                                      fit_height,
                                       &resize))
           {
-              snprintf(line, 
-                       sizeof(line), 
+              snprintf(line,
+                       sizeof(line),
                        "Scaled: %dx%d, %dbpp",
                        resize.width,
                        resize.height,
                        resize.bpp);
-              
+
               display_show_line(5, line);
               display_show_line(6, "Resize: OK");
           }else{
